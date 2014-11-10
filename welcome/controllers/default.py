@@ -20,6 +20,9 @@ def index():
     response.flash = T("Welcome to web2py!")
     return dict(message=T('Hello World'))
 
+def test():
+    return dict()
+
 def user():
     """
     exposes:
@@ -46,7 +49,7 @@ def download():
     """
     return response.download(request, db)
 
-
+@auth.requires_login()
 def call():
     """
     exposes services. for example:
@@ -56,8 +59,12 @@ def call():
     """
     return service()
 
+
+auth.settings.allow_basic_login = True
+@auth.requires_login()
 @request.restful()
 def api():
+    session.forget()
     def GET(table,id='all'):
         if table == 'messages':
             if str(id.lower()) == 'all':
@@ -70,9 +77,20 @@ def api():
             #get all contacts
             return 'This is all contacts'
     def POST(*args,**vars):
-        return dict()
+        message = 'DEFAULT'
+        target = 'TARGET'
+        if len(args) > 0:
+            if 'send' == args[0]:
+                message = args[1]
+                target = args[2]
+        elif vars['type'] == 'send':
+            message = vars['message']
+            target = vars['to']
+        return 'You have posted to "%s" a message that says: "%s"' % (target, message)
     def PUT(*args,**vars):
-        return dict()
-    def DELETE(*args,**vars):
-        return dict()
+        return ''
+    def DELETE(table,id):
+        if table == 'messages':
+            return 'You have deleted message %s' % id
+        return 'invalid'
     return locals()
