@@ -1,0 +1,25 @@
+127.0.0.1, 2014-11-15 16:25:04, GET, /, HTTP/1.1, 303, 0.010000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/default/index, HTTP/1.1, 200, 0.187000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/js/modernizr.custom.js, HTTP/1.1, 200, 0.002000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/css/calendar.css, HTTP/1.1, 200, 0.002000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/js/jquery.js, HTTP/1.1, 200, 0.004000
+
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/js/web2py.js, HTTP/1.1, 200, 0.005000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/css/web2py.css, HTTP/1.1, 200, 0.006000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/css/bootstrap-responsive.min.css, HTTP/1.1, 200, 0.002000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/css/bootstrap.min.css, HTTP/1.1, 200, 0.002000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/css/web2py_bootstrap.css, HTTP/1.1, 200, 0.001000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/js/web2py_bootstrap.js, HTTP/1.1, 200, 0.001000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/js/bootstrap.min.js, HTTP/1.1, 200, 0.004000
+127.0.0.1, 2014-11-15 16:25:04, GET, /welcome/static/js/share.js, HTTP/1.1, 200, 0.001000
+127.0.0.1, 2014-11-15 16:25:05, GET, /welcome/static/images/gplus-32.png, HTTP/1.1, 200, 0.003000
+127.0.0.1, 2014-11-15 16:25:05, GET, /welcome/static/images/twitter.png, HTTP/1.1, 200, 0.005000
+127.0.0.1, 2014-11-15 16:25:05, GET, /welcome/static/images/facebook.png, HTTP/1.1, 200, 0.004000
+127.0.0.1, 2014-11-15 16:25:05, GET, /welcome/static/images/favicon.ico, HTTP/1.1, 200, 0.001000
+127.0.0.1, 2014-11-15 16:31:02, GET, /welcome/messages, HTTP/1.1, 404, 0.040000
+127.0.0.1, 2014-11-15 16:31:03, GET, /favicon.ico, HTTP/1.1, 400, 0.000000
+127.0.0.1, 2014-11-15 16:31:28, GET, /welcome/api/messages, HTTP/1.1, 404, 0.040000
+127.0.0.1, 2014-11-15 16:31:28, GET, /favicon.ico, HTTP/1.1, 400, 0.000000
+127.0.0.1, 2014-11-15 16:31:36, GET, /welcome/api/messages/123, HTTP/1.1, 404, 0.030000
+127.0.0.1, 2014-11-15 16:31:36, GET, /favicon.ico, HTTP/1.1, 400, 0.002000
+127.0.0.1, 2014-11-15 16:31:38, GET, /favicon.ico, HTTP/1.1, 400, 0.000000
