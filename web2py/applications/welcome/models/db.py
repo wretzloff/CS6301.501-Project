@@ -7,7 +7,7 @@
 
 ## if SSL/HTTPS is properly configured and you want all HTTP requests to
 ## be redirected to HTTPS, uncomment the line below:
-# request.requires_https()
+#request.requires_https()
 
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
@@ -83,6 +83,8 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
+
+db.define_table('messages', Field('to_user', 'reference auth_user', requires=IS_NOT_EMPTY()), Field('from_user', 'reference auth_user', requires=IS_NOT_EMPTY()), Field('email_text', 'text', requires=IS_NOT_EMPTY()))
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

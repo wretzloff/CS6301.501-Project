@@ -23,6 +23,10 @@ def index():
 def test():
     return dict()
 
+def teamA():
+    response.flash = str(request.folder)
+    return dict()
+
 def user():
     """
     exposes:
@@ -57,7 +61,6 @@ def call():
     decorate with @services.jsonrpc the functions to expose
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
-    session.forget()
     return service()
 
 
@@ -66,17 +69,35 @@ auth.settings.allow_basic_login = True
 @request.restful()
 def api():
     session.forget()
-    def GET(table,id='all'):
+    def GET(table,message_id='all'):
         if table == 'messages':
-            if str(id.lower()) == 'all':
-                #get all messages
-                return 'This is all messages'
+            if message_id.lower() == 'all':
+                user_id = auth.user.id
+                message_list = []
+                for user_row in db(db.auth_user.id == user_id).select():
+                    for message_row in user_row.messages.select():
+                        message_list.append('%s: %s' % (message_row.id, message_row.email_text))
+                return 'This is all messages: %s' % message_list
             else:
-                #get message by id
-                return 'This is all message with id %s' % id
+                try:
+                    message_id = int(message_id)
+                except:
+                    return 'FAIL! ID not an integer.'
+                user_id = auth.user.id
+                message = ''
+                for user_row in db(db.auth_user.id == user_id).select():
+                    for message_row in user_row.messages.select():
+                        if message_row.id == message_id:
+                            message = message_row.email_text
+                if message == '':
+                    return 'FAIL! Message id not found.'
+                else:
+                    return '%s: %s' % (message_id, message)
         elif table == 'contacts':
-            #get all contacts
-            return 'This is all contacts'
+            contacts = []
+            for row in db().select(db.auth_user.email):
+                contacts.append(row.email)
+            return 'This is all contacts: %s' % contacts
     def POST(*args,**vars):
         message = 'DEFAULT'
         target = 'TARGET'
@@ -87,11 +108,80 @@ def api():
         elif vars['type'] == 'send':
             message = vars['message']
             target = vars['to']
-        return 'You have posted to "%s" a message that says: "%s"' % (target, message)
+        if message == '' or message == 'DEFAULT':
+            return 'FAIL! Invalid message.'
+        else:
+            try:
+                row = db(db.auth_user.email == target).select(db.auth_user.id)
+            except:
+                return 'FAIL! Error at getting target user.'
+            if len(row) == 0:
+                return 'FAIL! Target %s not found.' % target
+            else:
+                target_id = row[0].id
+                user_id = auth.user.id
+                db.messages.insert(to_user=target_id, from_user=user_id, email_text=message)
+            return 'You have posted to "%s" a message that says: "%s"' % (target, message)
     def PUT(*args,**vars):
         return ''
-    def DELETE(table,id):
+    def DELETE(table,message_id):
         if table == 'messages':
-            return 'You have deleted message %s' % id
+            try:
+                message_id = int(message_id)
+            except:
+                return 'FAIL! ID not an integer.'
+            db(db.messages.id == message_id).delete()
+            return 'You have deleted message %s' % message_id
         return 'invalid'
     return locals()
+
+
+
+
+#----- SSL ---------------
+def create_self_signed_cert(cert_dir):
+    """
+    create a new self-signed cert and key and write them to disk
+    """
+    from OpenSSL import crypto, SSL
+    from socket import gethostname
+    from pprint import pprint
+    from time import gmtime, mktime
+    from os.path import exists, join
+
+    CERT_FILE = "ssl_certificate.crt"
+    KEY_FILE = "ssl_self_signed.key"
+    ssl_created = False
+    if not exists(join(cert_dir, CERT_FILE)) or not exists(join(cert_dir, KEY_FILE)):
+        ssl_created = True
+        # create a key pair
+        k = crypto.PKey()
+        k.generate_key(crypto.TYPE_RSA, 4096)
+
+        # create a self-signed cert
+        cert = crypto.X509()
+        cert.get_subject().C = "AQ"
+        cert.get_subject().ST = "State"
+        cert.get_subject().L = "City"
+        cert.get_subject().O = "Company"
+        cert.get_subject().OU = "Organization"
+        cert.get_subject().CN = gethostname()
+        cert.set_serial_number(1000)
+        cert.gmtime_adj_notBefore(0)
+        cert.gmtime_adj_notAfter(10*365*24*60*60)
+        cert.set_issuer(cert.get_subject())
+        cert.set_pubkey(k)
+        cert.sign(k, 'sha1')
+
+        open(join(cert_dir, CERT_FILE), "wt").write(
+            crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
+        open(join(cert_dir, KEY_FILE), "wt").write(
+            crypto.dump_privatekey(crypto.FILETYPE_PEM, k))
+
+        create_self_signed_cert('.')
+
+    return(ssl_created, cert_dir, CERT_FILE, KEY_FILE)
+
+def generate_ssl_key():
+    ssl_created, cert_dir, CERT_FILE, KEY_FILE = create_self_signed_cert(request.folder + "private/")
+    return(dict(ssl_created=ssl_created, cert_dir=cert_dir, CERT_FILE=CERT_FILE, KEY_FILE=KEY_FILE))

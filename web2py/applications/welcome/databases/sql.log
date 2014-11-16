@@ -53,3 +53,11 @@ CREATE TABLE auth_cas(
     renew CHAR(1)
 );
 success!
+timestamp: 2014-11-16T11:01:51.045000
+CREATE TABLE messages(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    to_user INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    from_user INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    email_text TEXT
+);
+success!

@@ -1,0 +1,8 @@
+{{extend 'layout.html'}}
+<h1>SSL certificate and key generated</h1>
+
+Saved to: {{=cert_dir}}<br>
+Certificate: {{=cert_dir}}{{=CERT_FILE}}<br>
+Self-signed Key: {{=cert_dir}}{{=KEY_FILE}}<br><br>
+Run web2py with SSL:<br>
+python web2py.py -c {{=cert_dir}}\{{=CERT_FILE}} -k {{=cert_dir}}\{{=KEY_FILE}} -i IP -p PORT
