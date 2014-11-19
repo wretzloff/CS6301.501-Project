@@ -10,7 +10,7 @@ function sendPost(){
               },
         dataType: 'text',
         beforeSend: function (xhr){
-            xhr.setRequestHeader('Authorization', make_base_auth('will@teamA.com','1234567890'));
+            //xhr.setRequestHeader('Authorization', make_base_auth('will@teamA.com','1234567890'));
         },
         success: function(data) {
             alert(data);
@@ -25,10 +25,10 @@ function sendGet(callbackFunctionOnSuccess){
 	$.ajax({
         url: "http://127.0.0.1:8000/welcome/default/api",
         type: "GET",
-        data: {	table: 'messages', message_id: 1},
+        data: {	table: 'messages', message_id: 'all'},
         dataType: 'text',
         beforeSend: function (xhr){
-            xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
+            //xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: callbackFunctionOnSuccess,
         error: function(jqXHR, textStatus, errorThrown) {
@@ -46,7 +46,7 @@ function sendDelete(){
         data: {	table: 'messages', message_id: 3},
         dataType: 'text',
         beforeSend: function (xhr){
-            xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
+            //xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: function(data) {
             alert(data);
