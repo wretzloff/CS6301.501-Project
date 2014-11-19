@@ -12,7 +12,7 @@
 @auth.requires_login()
 def index():
     response.title = "Inbox for " + auth.user.email
-    return dict(message=T('Hello World'))
+    return dict()
 
 def test():
     return dict()

@@ -80,15 +80,5 @@ $(document).ready(function(){
 
 {{left_sidebar_enabled,right_sidebar_enabled=False,('message' in globals())}}
 {{extend 'layout.html'}}
-
-{{if 'message' in globals():}}
 <h1 id='tempElement'></h1>
-{{elif 'content' in globals():}}
-{{=content}}
-{{else:}}
-{{=BEAUTIFY(response._vars)}}
-{{pass}}
 
-{{block right_sidebar}}
-
-{{end}}
