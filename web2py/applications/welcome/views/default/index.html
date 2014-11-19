@@ -21,8 +21,8 @@ function sendPost(){
     });
 }
 
-function sendGet(){
-    $.ajax({
+function sendGet(callbackFunctionOnSuccess){
+	$.ajax({
         url: "http://127.0.0.1:8000/welcome/default/api",
         type: "GET",
         data: {	table: 'messages', message_id: 1},
@@ -30,13 +30,13 @@ function sendGet(){
         beforeSend: function (xhr){
             xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
-        success: function(data) {
-            alert(data);
-        },
+        success: callbackFunctionOnSuccess,
         error: function(jqXHR, textStatus, errorThrown) {
             alert('Error');
         }
     });
+	
+	return returnData;
 }
 
 function sendDelete(){
@@ -63,7 +63,16 @@ function make_base_auth(user, password){
     return 'Basic ' + hash;
 }
 
-sendPost();
+function getSuccessfulCallbackFunction(resultFromGetRequest) 
+{
+	$('#tempElement').html(resultFromGetRequest);
+	
+}
+
+$(document).ready(function(){
+	sendGet(getSuccessfulCallbackFunction);
+});
+//sendPost();
 //sendGet();
 //sendDelete();
 </script>
@@ -88,6 +97,7 @@ sendPost();
            _href=URL('admin','default','peek',args=(request.application,'views',request.controller,'index.html')))))}}</li>
   <li>{{=T('You can modify this application and adapt it to your needs')}}</li>
 </ol>
+<h1 id='tempElement'></h1>
 {{elif 'content' in globals():}}
 {{=content}}
 {{else:}}
