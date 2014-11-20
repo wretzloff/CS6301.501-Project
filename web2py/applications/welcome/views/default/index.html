@@ -21,7 +21,7 @@ function sendPost(){
     });
 }
 
-function sendGet(callbackFunctionOnSuccess){
+function getAllMessages(callbackFunctionOnSuccess){
 	$.ajax({
         url: "http://127.0.0.1:8000/welcome/default/api",
         type: "GET",
@@ -70,15 +70,11 @@ function getSuccessfulCallbackFunction(resultFromGetRequest)
 }
 
 $(document).ready(function(){
-	sendGet(getSuccessfulCallbackFunction);
+	//Call the Get Messages service to retrieve all messages for this user and use the results to update the page.
+	getAllMessages(getSuccessfulCallbackFunction);
 });
-//sendPost();
-//sendGet();
-//sendDelete();
 </script>
 
-
-{{left_sidebar_enabled,right_sidebar_enabled=False,('message' in globals())}}
 {{extend 'layout.html'}}
 <h1 id='tempElement'></h1>
 
