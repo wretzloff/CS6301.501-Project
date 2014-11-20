@@ -1,3 +1,8 @@
+<style>
+	td {
+		border: 1px solid black;
+	}			
+</style>
 <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script type="text/javascript">
 function sendPost(){
@@ -66,7 +71,6 @@ function make_base_auth(user, password){
 function getSuccessfulCallbackFunction(resultFromGetRequest) 
 {
 	$('#tempElement').html(resultFromGetRequest);
-	
 }
 
 $(document).ready(function(){
@@ -76,5 +80,11 @@ $(document).ready(function(){
 </script>
 
 {{extend 'layout.html'}}
+<table id='messageTable' style="width:95%">
+	<tr>
+		<td style="text-align:center;font-size: 32px;">Sender</td>
+		<td style="text-align:center;font-size: 32px;">Message</td>
+	</tr>
+</table>
 <h1 id='tempElement'></h1>
 
