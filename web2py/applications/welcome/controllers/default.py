@@ -14,7 +14,8 @@ def index():
     response.title = "Inbox for " + auth.user.email
     return dict()
 
-def test():
+def compose():
+    response.title = "Compose message"
     return dict()
 
 def teamA():
