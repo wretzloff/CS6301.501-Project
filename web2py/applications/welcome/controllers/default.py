@@ -16,7 +16,10 @@ def index():
 
 def compose():
     response.title = "Compose message"
-    return dict()
+    form=FORM('To:', INPUT(_name='toField'), 
+		TEXTAREA(_name='messageField'), 
+		INPUT(_type='submit', _value="Send"))
+    return dict(form=form)
 
 def teamA():
     """
