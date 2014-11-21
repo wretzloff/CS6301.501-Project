@@ -1,3 +1,24 @@
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+function sendPost(callbackFunctionOnSuccess){
+    $.ajax({
+        url: "http://127.0.0.1:8000/welcome/default/api",
+        type: "POST",
+        data: {	type: 'send',
+                message: 'This is my message from AJAX2',
+				to: 'wretzloff@teamA.com',
+              },
+        dataType: 'text',
+        beforeSend: function (xhr){
+        },
+        success: callbackFunctionOnSuccess,
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('Error');
+        }
+    });
+}
+
+</script>
 {{extend 'layout.html'}}
 <a href="{{=URL('index')}}">Inbox</a>
 {{=form}}
