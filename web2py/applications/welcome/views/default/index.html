@@ -71,7 +71,26 @@ function make_base_auth(user, password){
 function getSuccessfulCallbackFunction(resultFromGetRequest) 
 {
 	$('#tempElement').html(resultFromGetRequest);
+	//Loop through the list of messages and use addRow() display each one on the screen.
+	addRow('This is a dummy email sender','This is dummy email text');
+	addRow('...','...');
 }
+
+function addRow(cell1Text, cell2Text)
+{
+				//Create a row
+				var row=document.createElement("tr");
+				//Create cells in row
+				var cell1 = row.insertCell(-1);
+				var cell2 = row.insertCell(-1);
+				//Add button to proper cell
+				cell1.innerHTML = cell1Text;
+				cell2.innerHTML = cell2Text;
+				//Insert the row into the table
+				$('#messageTable').append(row);
+				
+				
+}	
 
 $(document).ready(function(){
 	//Call the Get Messages service to retrieve all messages for this user and use the results to update the page.
