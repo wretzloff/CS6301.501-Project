@@ -16,9 +16,15 @@ def index():
 
 def compose():
     response.title = "Compose message"
-    form=FORM('To:', INPUT(_name='toField'), 
-		TEXTAREA(_name='messageField'), 
+    form=FORM('To:', INPUT(_name='toField',requires=IS_NOT_EMPTY()), 
+		TEXTAREA(_name='messageField',requires=IS_NOT_EMPTY()), 
 		INPUT(_type='submit', _value="Send"))
+    if form.accepts(request,session):
+        response.flash = 'form accepted'
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form'
     return dict(form=form)
 
 def teamA():
