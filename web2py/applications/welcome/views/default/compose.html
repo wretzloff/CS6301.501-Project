@@ -23,16 +23,6 @@ function successCallbackFunction(resultFromPost)
 	alert(resultFromPost);
 }
 
-function send()
-{
-	//Get the data from the form and pass it to sendMessage().
-	to = 'wretzloff@teamA.com';
-	message = 'examplemessage';
-	sendMessage(successCallbackFunction, to, message);
-}
-
-send();
-
 </script>
 {{extend 'layout.html'}}
 <a href="{{=URL('index')}}">Inbox</a>
