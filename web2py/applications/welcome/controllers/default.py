@@ -25,7 +25,7 @@ def compose():
         response.flash = 'form has errors'
     else:
         response.flash = 'please fill the form'
-    return dict(form=form)
+    return dict(formToDisplay=form)
 
 def teamA():
     """

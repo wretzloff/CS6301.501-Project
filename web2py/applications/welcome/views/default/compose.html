@@ -21,7 +21,7 @@ function sendPost(callbackFunctionOnSuccess){
 </script>
 {{extend 'layout.html'}}
 <a href="{{=URL('index')}}">Inbox</a>
-{{=form}}
+{{=formToDisplay}}
 <h2>Submitted text</h2>
 {{=BEAUTIFY(request.vars)}}
 <h6>{{request.vars.toField}}</h6>
