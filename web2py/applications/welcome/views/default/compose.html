@@ -24,7 +24,22 @@ function successCallbackFunction(resultFromPost)
 	alert(resultFromPost);
 }
 
+function sendButton()
+{
+	alert('To: ' + $('#toField').val());
+	alert('Message: ' + $('#messageField').val());
+}
+
 </script>
 <a href="{{=URL('index')}}">Inbox</a>
 
+<form action="javascript:sendButton();">
+	To:
+	<input type="text" id='toField' name="toField">
+	<br>
+	<textarea id="messageField" cols="40" rows="5" name="messageField">
+	</textarea>
+	<br>
+	<input type="submit" value="Send">
+</form>
  
