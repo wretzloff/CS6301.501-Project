@@ -26,8 +26,12 @@ function successCallbackFunction(resultFromPost)
 
 function sendButton()
 {
-	alert('To: ' + $('#toField').val());
-	alert('Message: ' + $('#messageField').val());
+	//Grab the information entered by the user
+	var to = $('#toField').val();
+	var message = $('#messageField').val();
+	
+	//Pass the information enterd by the user to sendMessage in order to have the message posted.
+	sendMessage(successCallbackFunction, to, message);
 }
 
 </script>
