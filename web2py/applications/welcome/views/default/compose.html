@@ -19,9 +19,31 @@ function sendMessage(callbackFunctionOnSuccess, messageTo, messageText){
     });
 }
 
-function postSuccessfulCallbackFunction(resultFromPost) 
+function getAllContacts(callbackFunctionOnSuccess){
+	$.ajax({
+        url: "http://127.0.0.1:8000/welcome/default/api",
+        type: "GET",
+        data: {	table: 'contacts', message_id: 'all'},
+        dataType: 'text',
+        beforeSend: function (xhr){
+        },
+        success: callbackFunctionOnSuccess,
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('Error');
+        }
+    });
+	
+	return returnData;
+}
+
+function postSuccessfulCallbackFunction(resultFromPostRequest) 
 {
-	alert(resultFromPost);
+	alert(resultFromPostRequest);
+}
+
+function getSuccessfulCallbackFunction(resultFromGetRequest) 
+{
+	$('#contactDiv').html(resultFromGetRequest);
 }
 
 function sendButton()
@@ -34,11 +56,16 @@ function sendButton()
 	sendMessage(postSuccessfulCallbackFunction, to, message);
 }
 
+$(document).ready(function(){
+	//Call the Get Contacts service to retrieve all contacts and use the results to update the page.
+	getAllContacts(getSuccessfulCallbackFunction);
+});
+
 </script>
 <a href="{{=URL('index')}}">Inbox</a>
 <table>
 	<tr>
-		<td style="width:85%">
+		<td style="width:80%">
 			<form action="javascript:sendButton();">
 				To:
 				<input type="text" id='toField'>
@@ -52,28 +79,7 @@ function sendButton()
 		<td> 
 			Contacts
 			<br>
-			<div style="width:100%;height:200px;border:1px solid black;overflow:scroll;">
-				This will be a list of clickable email addresses. Clicking on a email address will add it to the To field.
-				<br>
-				example1@example.com
-				<br>
-				example2@example.com
-				<br>
-				example3@example.com
-				<br>
-				example4@example.com
-				<br>
-				example5@example.com
-				<br>
-				example6@example.com
-				<br>
-				example7@example.com
-				<br>
-				example8@example.com
-				<br>
-				example9@example.com
-				<br>
-				example10@example.com
+			<div id='contactDiv' style="width:100%;height:200px;border:1px solid black;overflow:scroll;">
 			</div>
 		</td>
 	</tr>
