@@ -19,7 +19,7 @@ function sendMessage(callbackFunctionOnSuccess, messageTo, messageText){
     });
 }
 
-function successCallbackFunction(resultFromPost) 
+function postSuccessfulCallbackFunction(resultFromPost) 
 {
 	alert(resultFromPost);
 }
@@ -31,7 +31,7 @@ function sendButton()
 	var message = $('#messageField').val();
 	
 	//Pass the information enterd by the user to sendMessage in order to have the message posted.
-	sendMessage(successCallbackFunction, to, message);
+	sendMessage(postSuccessfulCallbackFunction, to, message);
 }
 
 </script>
