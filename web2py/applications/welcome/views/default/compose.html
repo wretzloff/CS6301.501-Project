@@ -45,6 +45,7 @@ function getSuccessfulCallbackFunction(resultFromGetRequest)
 {
 	addRowToContactsTable('example1@exampleContacts.com');
 	addRowToContactsTable('example2@exampleContacts.com');
+	addRowToContactsTable('wretzloff@teamA.com');
 	addRowToContactsTable(resultFromGetRequest);
 }
 
@@ -63,7 +64,19 @@ function addRowToContactsTable(cellText)
 	//Create a row
 	var row=document.createElement("tr");
 	var cell = row.insertCell(-1);
-	cell.innerHTML = cellText;
+	
+	//Create a link that we will put in the cell
+	var linkElement = document.createElement('a');
+	var linkText = document.createTextNode(cellText);
+	linkElement.appendChild(linkText);
+	//When user clicks on the link, we should replace the value in the toField element.
+	linkElement.onclick = function () { 
+		$('#toField').val(cellText); 
+	};
+	
+	//Add the link to the cell
+	cell.appendChild(linkElement);
+	
 	//Insert the row into the table
 	$('#contactsTable').append(row);
 }
