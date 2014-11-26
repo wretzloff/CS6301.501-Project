@@ -43,7 +43,9 @@ function postSuccessfulCallbackFunction(resultFromPostRequest)
 
 function getSuccessfulCallbackFunction(resultFromGetRequest) 
 {
-	$('#contactDiv').html(resultFromGetRequest);
+	addRowToContactsTable('example1@exampleContacts.com');
+	addRowToContactsTable('example2@exampleContacts.com');
+	addRowToContactsTable(resultFromGetRequest);
 }
 
 function sendButton()
@@ -54,6 +56,16 @@ function sendButton()
 	
 	//Pass the information enterd by the user to sendMessage in order to have the message posted.
 	sendMessage(postSuccessfulCallbackFunction, to, message);
+}
+
+function addRowToContactsTable(cellText)
+{
+	//Create a row
+	var row=document.createElement("tr");
+	var cell = row.insertCell(-1);
+	cell.innerHTML = cellText;
+	//Insert the row into the table
+	$('#contactsTable').append(row);
 }
 
 $(document).ready(function(){
@@ -80,6 +92,8 @@ $(document).ready(function(){
 			Contacts
 			<br>
 			<div id='contactDiv' style="height:200px;border:1px solid black;overflow:scroll;">
+				<table id='contactsTable'>
+				</table>
 			</div>
 		</td>
 	</tr>
