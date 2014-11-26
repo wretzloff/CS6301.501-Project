@@ -36,14 +36,49 @@ function sendButton()
 
 </script>
 <a href="{{=URL('index')}}">Inbox</a>
+<table>
+	<tr>
+		<td style="width:85%">
+			<form action="javascript:sendButton();">
+				To:
+				<input type="text" id='toField'>
+				<br>
+				<textarea id="messageField" style="height: 150px;">
+				</textarea>
+				<br>
+				<input type="submit" value="Send">
+			</form>
+		</td>
+		<td> 
+			Contacts
+			<br>
+			<div style="width:100%;height:200px;border:1px solid black;overflow:scroll;">
+				This will be a list of clickable email addresses. Clicking on a email address will add it to the To field.
+				<br>
+				example1@example.com
+				<br>
+				example2@example.com
+				<br>
+				example3@example.com
+				<br>
+				example4@example.com
+				<br>
+				example5@example.com
+				<br>
+				example6@example.com
+				<br>
+				example7@example.com
+				<br>
+				example8@example.com
+				<br>
+				example9@example.com
+				<br>
+				example10@example.com
+			</div>
+		</td>
+	</tr>
+<table>
 
-<form action="javascript:sendButton();">
-	To:
-	<input type="text" id='toField'>
-	<br>
-	<textarea id="messageField" style="width:60%; height: 150px;">
-	</textarea>
-	<br>
-	<input type="submit" value="Send">
-</form>
+
+
  
