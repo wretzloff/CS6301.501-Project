@@ -53,27 +53,39 @@ def api():
     def GET(table,message_id='all'):
         if table == 'messages':
             if message_id.lower() == 'all':
+                #Build an array of Messages
                 user_id = auth.user.id
                 message_list = []
                 for user_row in db(db.auth_user.id == user_id).select():
                     for message_row in user_row.messages.select():
                         message_list.append('%s: %s' % (message_row.id, message_row.email_text))
-                return 'This is all messages: %s' % message_list
+                
+                #Convert the array to a JSON string and return the JSON string
+                json_string = json.dumps(message_list)
+                return json_string
             else:
                 try:
                     message_id = int(message_id)
                 except:
                     return 'FAIL! ID not an integer.'
+				
+                #Get the specified message
                 user_id = auth.user.id
                 message = ''
                 for user_row in db(db.auth_user.id == user_id).select():
                     for message_row in user_row.messages.select():
                         if message_row.id == message_id:
                             message = message_row.email_text
+                
+                #If the message was found, convert it to a JSON string and return the JSON string
                 if message == '':
                     return 'FAIL! Message id not found.'
                 else:
-                    return '%s: %s' % (message_id, message)
+                    messages = []
+                    messages.append(message)
+                    json_string = json.dumps(messages)
+                    return json_string
+                    
         elif table == 'contacts':
             #Build an array of Contacts
             contacts = []
