@@ -48,6 +48,7 @@ auth.settings.allow_basic_login = True
 @auth.requires_login()
 @request.restful()
 def api():
+    import json
     session.forget()
     def GET(table,message_id='all'):
         if table == 'messages':
@@ -74,10 +75,14 @@ def api():
                 else:
                     return '%s: %s' % (message_id, message)
         elif table == 'contacts':
+            #Build an array of Contacts
             contacts = []
             for row in db().select(db.auth_user.email):
                 contacts.append(row.email)
-            return 'This is all contacts: %s' % contacts
+            
+            #Convert the array to a JSON string and return the JSON string
+            json_string = json.dumps(contacts)
+            return json_string
     def POST(*args,**vars):
         message = 'DEFAULT'
         target = 'TARGET'
