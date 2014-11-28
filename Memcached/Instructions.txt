@@ -1,0 +1,13 @@
+
+Installing Memcached server instructions:
+
+1. Extract to path such as C:\memcached
+2. Run command line (as administrator preferably)
+3. C:\memcached\memcached.exe -d install
+4. C:\memcached\memcached.exe -d start
+
+To check if it's running:
+
+Run command netstat -a | find "11211"
+
+11211 is port number.

@@ -84,7 +84,17 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
-db.define_table('messages', Field('to_user', 'reference auth_user', requires=IS_NOT_EMPTY()), Field('from_user', 'reference auth_user', requires=IS_NOT_EMPTY()), Field('email_text', 'text', requires=IS_NOT_EMPTY()))
+db.define_table('messages', 
+    Field('to_user', 'reference auth_user', requires=IS_NOT_EMPTY()), 
+    Field('from_user', 'reference auth_user', requires=IS_NOT_EMPTY()), 
+    Field('email_text', 'text', requires=IS_NOT_EMPTY()),
+    Field('deleted', 'boolean', requires=IS_NOT_EMPTY(), default=False)#,Field('read', 'boolean', requires=IS_NOT_EMPTY(), default=False)
+    )
+
+db.define_table('msg_recipients', #This is for multiple recipients
+    Field('message_id', 'references messages', requires=IS_NOT_EMPTY()), 
+    Field('to_user', 'reference auth_user', requires=IS_NOT_EMPTY())
+    )
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
