@@ -24,6 +24,27 @@ def user():
     """
     return dict(form=auth())
 
+def memcached():
+    memcached = None
+    retrieveMemcache = None
+    response.title = "Memcache"
+
+    form=FORM('key:', INPUT(_name='key'), 
+        TEXTAREA(_name='value'), 
+        INPUT(_type='submit', _value="Send"))
+
+    retrieveForm =FORM('key:', INPUT(_name='key'), 
+        INPUT(_type='submit', _value="Send"))
+
+    if form.process(formname='form').accepted:
+        cache.memcache.set(request.vars.key, request.vars.value)
+        memcached = {request.vars.key: cache.memcache.get(request.vars.key)}
+
+    if retrieveForm.process(formname='form_two').accepted:
+        retrieveMemcache = cache.memcache.get(request.vars.key)
+
+    return locals()
+
 
 @cache.action()
 def download():

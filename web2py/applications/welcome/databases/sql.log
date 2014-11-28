@@ -61,3 +61,13 @@ CREATE TABLE messages(
     email_text TEXT
 );
 success!
+timestamp: 2014-11-27T17:55:49.299000
+ALTER TABLE messages ADD deleted CHAR(1);
+success!
+timestamp: 2014-11-27T17:55:49.491000
+CREATE TABLE msg_recipients(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message_id INTEGER REFERENCES messages (id) ON DELETE CASCADE,
+    to_user INTEGER REFERENCES auth_user (id) ON DELETE CASCADE
+);
+success!
