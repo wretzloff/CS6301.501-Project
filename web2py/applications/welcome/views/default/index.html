@@ -40,11 +40,14 @@ function sendDelete(){
 }
 
 function getSuccessfulCallbackFunction(resultFromGetRequest) 
-{
-	$('#tempElement').html(resultFromGetRequest);
-	//Loop through the list of messages and use addRow() display each one on the screen.
-	addRow('This is a dummy email sender','This is dummy email text');
-	addRow('...','...');
+{	
+	//Parse the result, which is a JSON array, into a JavaScript object
+	var responseObject = $.parseJSON(resultFromGetRequest);
+	//Loop through the JavaScript array and add a row to the Contacts list.
+	for (i = 0; i < responseObject.length; i++) 
+	{ 
+		addRow('', responseObject[i]);
+	}
 }
 
 function addRow(cell1Text, cell2Text)
@@ -78,5 +81,4 @@ $(document).ready(function(){
 		<td style="text-align:center;font-size: 32px;">Message</td>
 	</tr>
 </table>
-<h1 id='tempElement'></h1>
 
