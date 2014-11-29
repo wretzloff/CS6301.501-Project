@@ -43,10 +43,13 @@ function postSuccessfulCallbackFunction(resultFromPostRequest)
 
 function getSuccessfulCallbackFunction(resultFromGetRequest) 
 {
-	addRowToContactsTable('example1@exampleContacts.com');
-	addRowToContactsTable('example2@exampleContacts.com');
-	addRowToContactsTable('wretzloff@teamA.com');
-	addRowToContactsTable(resultFromGetRequest);
+	//Parse the result, which is a JSON array, into a JavaScript object
+	var responseObject = $.parseJSON(resultFromGetRequest);
+	//Loop through the JavaScript array and add a row to the Contacts list.
+	for (i = 0; i < responseObject.length; i++) 
+	{ 
+		addRowToContactsTable(responseObject[i]);
+	}
 }
 
 //This function to be called when the Send button is clicked.
