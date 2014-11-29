@@ -46,7 +46,12 @@ function getSuccessfulCallbackFunction(resultFromGetRequest)
 	//Loop through the JavaScript array and add a row to the Messages list.
 	for (i = 0; i < responseObject.length; i++) 
 	{ 
-		addRow('', responseObject[i]);
+		//Extract the message text and the email address that the message is from
+		var message = responseObject[i];
+		var from = message[0]
+		var messageText = message[1]
+		//Add a row to the message table
+		addRow(from, messageText);
 	}
 }
 
