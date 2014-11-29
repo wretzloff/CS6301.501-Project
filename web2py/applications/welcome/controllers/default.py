@@ -94,7 +94,9 @@ def api():
                     fromUserResults = db(fromUserQuery).select()
                     messageFrom = fromUserResults[0].email
                     #Add a row to the list that will be returned to the client
-                    addToReturnList = 'From: "%s" Message: "%s"' % (messageFrom, messageTxt)
+                    addToReturnList = []
+                    addToReturnList.append(messageFrom)
+                    addToReturnList.append(messageTxt)
                     message_list.append(addToReturnList)
                 
                 #Convert the array to a JSON string and return the JSON string
