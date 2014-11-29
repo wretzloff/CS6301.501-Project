@@ -79,7 +79,7 @@ def api():
                 message_list = []
                 for user_row in db(db.auth_user.id == user_id).select():
                     for message_row in user_row.messages.select():
-                        message_list.append('%s: %s' % (message_row.id, message_row.email_text))
+                        message_list.append(message_row.email_text)
                 
                 #Convert the array to a JSON string and return the JSON string
                 json_string = json.dumps(message_list)
