@@ -77,9 +77,25 @@ def api():
                 #Build an array of Messages
                 user_id = auth.user.id
                 message_list = []
-                for user_row in db(db.auth_user.id == user_id).select():
-                    for message_row in user_row.messages.select():
-                        message_list.append(message_row.email_text)
+                #Get the ID of the logged in user
+                loggedInUserQuery = (db.auth_user.id == user_id)
+                loggedInUserResults = db(loggedInUserQuery).select()
+                user_row_id = loggedInUserResults[0].id
+                #Get the messages that were sent to this user
+                messageListQuery = (db.messages.to_user == user_row_id)
+                messageListResults = db(messageListQuery).select()
+                #For each message
+                for messageRow in messageListResults:
+                    #Get the text of the email
+                    messageTxt = messageRow.email_text
+                    #Get the email address of the user that this email is from
+                    messageFromID = messageRow.from_user
+                    fromUserQuery = (db.auth_user.id == messageFromID)
+                    fromUserResults = db(fromUserQuery).select()
+                    messageFrom = fromUserResults[0].email
+                    #Add a row to the list that will be returned to the client
+                    addToReturnList = 'From: "%s" Message: "%s"' % (messageFrom, messageTxt)
+                    message_list.append(addToReturnList)
                 
                 #Convert the array to a JSON string and return the JSON string
                 json_string = json.dumps(message_list)
