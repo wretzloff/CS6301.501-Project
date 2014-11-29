@@ -43,7 +43,7 @@ function getSuccessfulCallbackFunction(resultFromGetRequest)
 {	
 	//Parse the result, which is a JSON array, into a JavaScript object
 	var responseObject = $.parseJSON(resultFromGetRequest);
-	//Loop through the JavaScript array and add a row to the Contacts list.
+	//Loop through the JavaScript array and add a row to the Messages list.
 	for (i = 0; i < responseObject.length; i++) 
 	{ 
 		addRow('', responseObject[i]);
