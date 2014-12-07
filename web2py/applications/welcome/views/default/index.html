@@ -12,6 +12,7 @@ function getAllMessages(callbackFunctionOnSuccess){
         data: {	table: 'messages', message_id: 'all'},
         dataType: 'text',
         beforeSend: function (xhr){
+			//xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: callbackFunctionOnSuccess,
         error: function(jqXHR, textStatus, errorThrown) {
@@ -29,6 +30,7 @@ function sendDelete(){
         data: {	table: 'messages', message_id: 3},
         dataType: 'text',
         beforeSend: function (xhr){
+			//xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: function(data) {
             alert(data);
@@ -57,18 +59,16 @@ function getSuccessfulCallbackFunction(resultFromGetRequest)
 
 function addRow(cell1Text, cell2Text)
 {
-				//Create a row
-				var row=document.createElement("tr");
-				//Create cells in row
-				var cell1 = row.insertCell(-1);
-				var cell2 = row.insertCell(-1);
-				//Add button to proper cell
-				cell1.innerHTML = cell1Text;
-				cell2.innerHTML = cell2Text;
-				//Insert the row into the table
-				$('#messageTable').append(row);
-				
-				
+	//Create a row
+	var row=document.createElement("tr");
+	//Create cells in row
+	var cell1 = row.insertCell(-1);
+	var cell2 = row.insertCell(-1);
+	//Add button to proper cell
+	cell1.innerHTML = cell1Text;
+	cell2.innerHTML = cell2Text;
+	//Insert the row into the table
+	$('#messageTable').append(row);			
 }	
 
 $(document).ready(function(){

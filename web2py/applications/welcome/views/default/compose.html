@@ -11,8 +11,11 @@ function sendMessage(callbackFunctionOnSuccess, messageTo, messageText){
               },
         dataType: 'text',
         beforeSend: function (xhr){
+			//xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
-        success: callbackFunctionOnSuccess,
+        success: function(result) {
+			alert('Success');
+		},
         error: function(jqXHR, textStatus, errorThrown) {
             alert('Error');
         }
@@ -26,6 +29,7 @@ function getAllContacts(callbackFunctionOnSuccess){
         data: {	table: 'contacts', message_id: 'all'},
         dataType: 'text',
         beforeSend: function (xhr){
+			//xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: callbackFunctionOnSuccess,
         error: function(jqXHR, textStatus, errorThrown) {
