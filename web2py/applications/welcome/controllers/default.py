@@ -1,6 +1,6 @@
 @auth.requires_login()
 def index():
-    response.title = "Inbox for " + auth.user.email
+    response.title = "Welcome to your inbox " + auth.user.first_name + "!"
     return dict()
 
 def compose():
@@ -107,23 +107,31 @@ def api():
                     message_id = int(message_id)
                 except:
                     return 'FAIL! ID not an integer.'
-				
+
                 #Get the specified message
                 user_id = auth.user.id
                 message = ''
-                for user_row in db(db.auth_user.id == user_id).select():
-                    for message_row in user_row.messages.select():
-                        if message_row.id == message_id:
-                            message = message_row.email_text
-                
-                #If the message was found, convert it to a JSON string and return the JSON string
-                if message == '':
-                    return 'FAIL! Message id not found.'
+
+                hsh = _hash(message_id, user_id)
+                message_in_cache = cache.memcache.get(hsh)
+
+                if message_in_cache:
+                    print "Message found in cache"
+                    return json.dumps(message_in_cache)
                 else:
-                    messages = []
-                    messages.append(message)
-                    json_string = json.dumps(messages)
-                    return json_string
+                    for user_row in db(db.auth_user.id == user_id).select():
+                        for message_row in user_row.messages.select():
+                            if message_row.id == message_id:
+                                message = message_row.email_text
+                    
+                    #If the message was found, convert it to a JSON string and return the JSON string
+                    if message == '':
+                        return 'FAIL! Message id not found.'
+                    else:
+                        messages = []
+                        messages.append(message)
+                        json_string = json.dumps(messages)
+                        return json_string
                     
         elif table == 'contacts':
             #Build an array of Contacts
@@ -144,6 +152,7 @@ def api():
         elif vars['type'] == 'send':
             message = vars['message']
             target = vars['to']
+
         if message == '' or message == 'DEFAULT':
             return 'FAIL! Invalid message.'
         else:
@@ -156,7 +165,9 @@ def api():
             else:
                 target_id = row[0].id
                 user_id = auth.user.id
-                db.messages.insert(to_user=target_id, from_user=user_id, email_text=message)
+                msgid = db.messages.insert(to_user=target_id, from_user=user_id, email_text=message)
+                hsh = _hash(msgid, user_id)
+                cache.memcache.add(hsh, message)
             return 'You have posted to "%s" a message that says: "%s"' % (target, message)
     def PUT(*args,**vars):
         return ''
@@ -169,13 +180,20 @@ def api():
             db(db.messages.id == message_id).delete()
             return 'You have deleted message %s' % message_id
         return 'invalid'
+
+    #This function uses MD5 hashing
+    def _hash(messageid, toUser):
+        import hashlib
+        hash_string = '%s%s' % (messageid, toUser)
+        hash_byte = bytearray(hash_string)
+        hash_object = hashlib.md5(hash_byte)
+        return hash_object.hexdigest()
+
     return locals()
-
-
-
 
 #----- SSL ---------------
 def generate_ssl_key():
     import os
     cert_dir, CERT_FILE, KEY_FILE = (os.path.join(request.folder, "private"), 'mysite.crt', 'mysite.key')
     return(dict(cert_dir=cert_dir, CERT_FILE=CERT_FILE, KEY_FILE=KEY_FILE))
+

@@ -88,7 +88,7 @@ db.define_table('messages',
     Field('to_user', 'reference auth_user', requires=IS_NOT_EMPTY()), 
     Field('from_user', 'reference auth_user', requires=IS_NOT_EMPTY()), 
     Field('email_text', 'text', requires=IS_NOT_EMPTY()),
-    Field('deleted', 'boolean', requires=IS_NOT_EMPTY(), default=False)#,Field('read', 'boolean', requires=IS_NOT_EMPTY(), default=False)
+    Field('deleted', 'boolean', requires=IS_NOT_EMPTY(), default=False)
     )
 
 db.define_table('msg_recipients', #This is for multiple recipients

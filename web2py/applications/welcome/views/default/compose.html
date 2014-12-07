@@ -1,21 +1,54 @@
-{{extend 'layout.html'}}
+<style>
+ul{
+    padding: 0 5 0 5;
+    list-style-type: none;
+}
+</style>
+
+<!--<a href="{{=URL('index')}}">Inbox</a>-->
+<table style="width:100%">
+	<tr>
+		<td style="width:80%">
+			<form action="javascript:sendButton();">
+				<label>To:</label>
+				<input type="text" id='toField'>
+				<br>
+                <br>
+				<textarea id="messageField" style="height: 150px; width: 90%"></textarea>
+				<!--<br>
+				<input type="submit" value="Send" class="btn btn-primary">-->
+			</form>
+		</td>
+		<td> 
+			Contacts
+			<br>
+			<div id='contactDiv' style="height:200px;border:1px solid black;overflow:auto;">
+				<ul id='contactsTable'>
+				</ul>
+			</div>
+		</td>
+	</tr>
+<table>
+
 <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script type="text/javascript">
 function sendMessage(callbackFunctionOnSuccess, messageTo, messageText){
-	$.ajax({
+    $.ajax({
         url: "http://127.0.0.1:8000/welcome/default/api",
         type: "POST",
-        data: {	type: 'send',
+        data: { type: 'send',
                 message: messageText,
-				to: messageTo,
+                to: messageTo
               },
         dataType: 'text',
         beforeSend: function (xhr){
-			//xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
+            //xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: function(result) {
-			alert('Success');
-		},
+            alert('Success');
+            //location.reload();
+            window.parent.closeModal();
+        },
         error: function(jqXHR, textStatus, errorThrown) {
             alert('Error');
         }
@@ -23,104 +56,76 @@ function sendMessage(callbackFunctionOnSuccess, messageTo, messageText){
 }
 
 function getAllContacts(callbackFunctionOnSuccess){
-	$.ajax({
+    $.ajax({
         url: "http://127.0.0.1:8000/welcome/default/api",
         type: "GET",
-        data: {	table: 'contacts', message_id: 'all'},
+        data: { table: 'contacts', message_id: 'all'},
         dataType: 'text',
         beforeSend: function (xhr){
-			//xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
+            //xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: callbackFunctionOnSuccess,
         error: function(jqXHR, textStatus, errorThrown) {
             alert('Error');
         }
     });
-	
-	return returnData;
 }
 
 function postSuccessfulCallbackFunction(resultFromPostRequest) 
 {
-	alert(resultFromPostRequest);
+    alert(resultFromPostRequest);
 }
 
 function getSuccessfulCallbackFunction(resultFromGetRequest) 
 {
-	//Parse the result, which is a JSON array, into a JavaScript object
-	var responseObject = $.parseJSON(resultFromGetRequest);
-	//Loop through the JavaScript array and add a row to the Contacts list.
-	for (i = 0; i < responseObject.length; i++) 
-	{ 
-		addRowToContactsTable(responseObject[i]);
-	}
+    //Parse the result, which is a JSON array, into a JavaScript object
+    var responseObject = $.parseJSON(resultFromGetRequest);
+    //Loop through the JavaScript array and add a row to the Contacts list.
+    for (i = 0; i < responseObject.length; i++) 
+    { 
+        addRowToContactsTable(responseObject[i]);
+    }
 }
 
 //This function to be called when the Send button is clicked.
 function sendButton()
 {
-	//Grab the information entered by the user
-	var to = $('#toField').val();
-	var message = $('#messageField').val();
-	
-	//Pass the information enterd by the user to sendMessage in order to have the message posted.
-	sendMessage(postSuccessfulCallbackFunction, to, message);
+    //Grab the information entered by the user
+    var to = $('#toField').val();
+    var message = $('#messageField').val();
+    
+    //Pass the information enterd by the user to sendMessage in order to have the message posted.
+    sendMessage(postSuccessfulCallbackFunction, to, message);
 }
 
 //Function that takes in a String, creates a link using that String, and adds that link to the Contacts list.
 function addRowToContactsTable(cellText)
 {
-	//Create a row
-	var row=document.createElement("tr");
-	var cell = row.insertCell(-1);
-	
-	//Create a link that we will put in the cell
-	var linkElement = document.createElement('a');
-	var linkText = document.createTextNode(cellText);
-	linkElement.appendChild(linkText);
-	//When user clicks on the link, we should replace the value in the toField element.
-	linkElement.onclick = function () { 
-		$('#toField').val(cellText); 
-	};
-	
-	//Add the link to the cell
-	cell.appendChild(linkElement);
-	
-	//Insert the row into the table
-	$('#contactsTable').append(row);
+    //Create a row
+    var li=document.createElement("li");
+    //var cell = row.insertCell(-1);
+    
+    //Create a link that we will put in the cell
+    var linkElement = document.createElement('a');
+    linkElement.href = "#";
+    linkElement.tabIndex = "-1";
+    var linkText = document.createTextNode(cellText);
+    linkElement.appendChild(linkText);
+    //When user clicks on the link, we should replace the value in the toField element.
+    linkElement.onclick = function () { 
+        $('#toField').val(cellText); 
+    };
+    
+    //Add the link to the cell
+    li.appendChild(linkElement);
+    li.style.padding="0px 0px 3px 0px";
+    //Insert the row into the table
+    $('#contactsTable').append(li);
 }
 
 $(document).ready(function(){
-	//When the page loads, call the Get Contacts service to retrieve all contacts and use the results to update the page.
-	getAllContacts(getSuccessfulCallbackFunction);
+    //When the page loads, call the Get Contacts service to retrieve all contacts and use the results to update the page.
+    getAllContacts(getSuccessfulCallbackFunction);
 });
 
 </script>
-<a href="{{=URL('index')}}">Inbox</a>
-<table style="width:100%">
-	<tr>
-		<td style="width:80%">
-			<form action="javascript:sendButton();">
-				To:
-				<input type="text" id='toField'>
-				<br>
-				<textarea id="messageField" style="height: 150px;">
-				</textarea>
-				<br>
-				<input type="submit" value="Send">
-			</form>
-		</td>
-		<td> 
-			Contacts
-			<br>
-			<div id='contactDiv' style="height:200px;border:1px solid black;overflow:scroll;">
-				<table id='contactsTable'>
-				</table>
-			</div>
-		</td>
-	</tr>
-<table>
-
-
-
- 
