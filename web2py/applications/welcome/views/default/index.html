@@ -103,11 +103,11 @@ table td.center, table th.center { text-align: center; }
 	</div>
 </div>
 
-<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<!--<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>-->
 <script type="text/javascript">
 function getAllMessages(callbackFunctionOnSuccess){
 	$.ajax({
-        url: "http://127.0.0.1:8000/welcome/default/api",
+        url: "https://127.0.0.1:8000/welcome/default/api",
         type: "GET",
         data: {	table: 'messages', message_id: 'all'},
         dataType: 'text',
@@ -123,7 +123,7 @@ function getAllMessages(callbackFunctionOnSuccess){
 
 function sendDelete(message_id){
     $.ajax({
-        url: "http://127.0.0.1:8000/welcome/default/api",
+        url: "https://127.0.0.1:8000/welcome/default/api",
         type: "DELETE",
         data: {	table: 'messages', message_id: message_id},
         dataType: 'text',

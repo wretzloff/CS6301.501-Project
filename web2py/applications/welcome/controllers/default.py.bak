@@ -1,30 +1,10 @@
-# -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
-
-#########################################################################
-## This is a sample controller
-## - index is the default action of any application
-## - user is required for authentication and authorization
-## - download is for downloading files uploaded in the db (does streaming)
-## - api is an example of Hypermedia API support and access control
-#########################################################################
-
+@auth.requires_login()
 def index():
-    """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
-
-    if you need a simple wiki simply replace the two lines below with:
-    return auth.wiki()
-    """
-    response.flash = T("Welcome to web2py!")
-    return dict(message=T('Hello World'))
-
-def test():
+    response.title = "Welcome to your inbox " + auth.user.first_name + "!"
     return dict()
 
-def teamA():
-    response.flash = str(request.folder)
+def compose():
+    response.title = "Compose message"
     return dict()
 
 def user():
@@ -43,6 +23,27 @@ def user():
     to decorate functions that need access control
     """
     return dict(form=auth())
+
+def memcached():
+    memcached = None
+    retrieveMemcache = None
+    response.title = "Memcache"
+
+    form=FORM('key:', INPUT(_name='key'), 
+        TEXTAREA(_name='value'), 
+        INPUT(_type='submit', _value="Send"))
+
+    retrieveForm =FORM('key:', INPUT(_name='key'), 
+        INPUT(_type='submit', _value="Send"))
+
+    if form.process(formname='form').accepted:
+        cache.memcache.set(request.vars.key, request.vars.value)
+        memcached = {request.vars.key: cache.memcache.get(request.vars.key)}
+
+    if retrieveForm.process(formname='form_two').accepted:
+        retrieveMemcache = cache.memcache.get(request.vars.key)
+
+    return locals()
 
 
 @cache.action()
@@ -68,36 +69,86 @@ auth.settings.allow_basic_login = True
 @auth.requires_login()
 @request.restful()
 def api():
+    import json
     session.forget()
     def GET(table,message_id='all'):
         if table == 'messages':
             if message_id.lower() == 'all':
+                #Build an array of Messages
                 user_id = auth.user.id
                 message_list = []
-                for user_row in db(db.auth_user.id == user_id).select():
-                    for message_row in user_row.messages.select():
-                        message_list.append('%s: %s' % (message_row.id, message_row.email_text))
-                return 'This is all messages: %s' % message_list
+                #Get the ID of the logged in user
+                loggedInUserQuery = (db.auth_user.id == user_id)
+                loggedInUserResults = db(loggedInUserQuery).select()
+                user_row_id = loggedInUserResults[0].id
+                #Get the messages that were sent to this user
+                messageListQuery = (db.messages.to_user == user_row_id)
+                messageListResults = db(messageListQuery).select()
+                #For each message
+                for messageRow in messageListResults:
+                    #Get the text of the email
+                    messageTxt = messageRow.email_text
+                    #Get the email address of the user that this email is from
+                    messageFromID = messageRow.from_user
+                    fromUserQuery = (db.auth_user.id == messageFromID)
+                    fromUserResults = db(fromUserQuery).select()
+                    messageFrom = fromUserResults[0].email
+                    #Add a row to the list that will be returned to the client
+                    addToReturnList = []
+                    addToReturnList.append(messageFrom)
+                    addToReturnList.append(messageTxt)
+                    message_list.append(addToReturnList)
+
+                #Convert the array to a JSON string and return the JSON string
+                json_string = json.dumps(message_list)
+                hsh = _hash('all', user_id)
+                cacheJson = cache.memcache.get(hsh)
+                if cacheJson:
+					print "Message found for request (%s,%s) in cache " % (user_id, 'all')
+					return cacheJson
+                else:
+                    cache.memcache.set(hsh, json_string)
+                    print "Message not found for request (%s,%s) in cache " % (user_id, 'all')
+                return json_string
             else:
                 try:
                     message_id = int(message_id)
                 except:
                     return 'FAIL! ID not an integer.'
+
+                #Get the specified message
                 user_id = auth.user.id
                 message = ''
-                for user_row in db(db.auth_user.id == user_id).select():
-                    for message_row in user_row.messages.select():
-                        if message_row.id == message_id:
-                            message = message_row.email_text
-                if message == '':
-                    return 'FAIL! Message id not found.'
+
+                hsh = _hash(message_id, user_id)
+                message_in_cache = cache.memcache.get(hsh)
+
+                if message_in_cache:
+                    print "Message found for request (%s,%s) in cache " % (user_id, message_id)
+                    return message_in_cache
                 else:
-                    return '%s: %s' % (message_id, message)
+                    for user_row in db(db.auth_user.id == user_id).select():
+                        for message_row in user_row.messages.select():
+                            if message_row.id == message_id:
+                                message = message_row.email_text
+                    #If the message was found, convert it to a JSON string and return the JSON string
+                    if message == '':
+                        return 'FAIL! Message id not found.'
+                    else:
+                        messages = []
+                        messages.append(message)
+                        json_string = json.dumps(messages)
+                        cache.memcache.add(hsh, json_string)
+                        print "Message found for request (%s,%s) in cache " % (user_id, message_id)
+                        return json_string
         elif table == 'contacts':
+            #Build an array of Contacts
             contacts = []
             for row in db().select(db.auth_user.email):
                 contacts.append(row.email)
-            return 'This is all contacts: %s' % contacts
+            #Convert the array to a JSON string and return the JSON string
+            json_string = json.dumps(contacts)
+            return json_string
     def POST(*args,**vars):
         message = 'DEFAULT'
         target = 'TARGET'
@@ -108,6 +159,7 @@ def api():
         elif vars['type'] == 'send':
             message = vars['message']
             target = vars['to']
+
         if message == '' or message == 'DEFAULT':
             return 'FAIL! Invalid message.'
         else:
@@ -120,7 +172,9 @@ def api():
             else:
                 target_id = row[0].id
                 user_id = auth.user.id
-                db.messages.insert(to_user=target_id, from_user=user_id, email_text=message)
+                msgid = db.messages.insert(to_user=target_id, from_user=user_id, email_text=message)
+                hsh = _hash('all', user_id)
+                cache.memcache.delete(hsh)
             return 'You have posted to "%s" a message that says: "%s"' % (target, message)
     def PUT(*args,**vars):
         return ''
@@ -133,55 +187,19 @@ def api():
             db(db.messages.id == message_id).delete()
             return 'You have deleted message %s' % message_id
         return 'invalid'
+
+    #This function uses MD5 hashing
+    def _hash(messageid, toUser):
+        import hashlib
+        hash_string = '%s%s' % (messageid, toUser)
+        hash_byte = bytearray(hash_string)
+        hash_object = hashlib.md5(hash_byte)
+        return hash_object.hexdigest()
+
     return locals()
 
-
-
-
 #----- SSL ---------------
-def create_self_signed_cert(cert_dir):
-    """
-    create a new self-signed cert and key and write them to disk
-    """
-    from OpenSSL import crypto, SSL
-    from socket import gethostname
-    from pprint import pprint
-    from time import gmtime, mktime
-    from os.path import exists, join
-
-    CERT_FILE = "ssl_certificate.crt"
-    KEY_FILE = "ssl_self_signed.key"
-    ssl_created = False
-    if not exists(join(cert_dir, CERT_FILE)) or not exists(join(cert_dir, KEY_FILE)):
-        ssl_created = True
-        # create a key pair
-        k = crypto.PKey()
-        k.generate_key(crypto.TYPE_RSA, 4096)
-
-        # create a self-signed cert
-        cert = crypto.X509()
-        cert.get_subject().C = "AQ"
-        cert.get_subject().ST = "State"
-        cert.get_subject().L = "City"
-        cert.get_subject().O = "Company"
-        cert.get_subject().OU = "Organization"
-        cert.get_subject().CN = gethostname()
-        cert.set_serial_number(1000)
-        cert.gmtime_adj_notBefore(0)
-        cert.gmtime_adj_notAfter(10*365*24*60*60)
-        cert.set_issuer(cert.get_subject())
-        cert.set_pubkey(k)
-        cert.sign(k, 'sha1')
-
-        open(join(cert_dir, CERT_FILE), "wt").write(
-            crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
-        open(join(cert_dir, KEY_FILE), "wt").write(
-            crypto.dump_privatekey(crypto.FILETYPE_PEM, k))
-
-        create_self_signed_cert('.')
-
-    return(ssl_created, cert_dir, CERT_FILE, KEY_FILE)
-
 def generate_ssl_key():
-    ssl_created, cert_dir, CERT_FILE, KEY_FILE = create_self_signed_cert(request.folder + "private/")
-    return(dict(ssl_created=ssl_created, cert_dir=cert_dir, CERT_FILE=CERT_FILE, KEY_FILE=KEY_FILE))
+    import os
+    cert_dir, CERT_FILE, KEY_FILE = (os.path.join(request.folder, "private"), 'mysite.crt', 'mysite.key')
+    return(dict(cert_dir=cert_dir, CERT_FILE=CERT_FILE, KEY_FILE=KEY_FILE))

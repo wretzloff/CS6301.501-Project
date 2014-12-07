@@ -98,9 +98,17 @@ def api():
                     addToReturnList.append(messageFrom)
                     addToReturnList.append(messageTxt)
                     message_list.append(addToReturnList)
-                
+
                 #Convert the array to a JSON string and return the JSON string
                 json_string = json.dumps(message_list)
+                hsh = _hash('all', user_id)
+                cacheJson = cache.memcache.get(hsh)
+                if cacheJson:
+					print "Message found for request (%s,%s) in cache " % (user_id, 'all')
+					return cacheJson
+                else:
+                    cache.memcache.set(hsh, json_string)
+                    print "Message not found for request (%s,%s) in cache " % (user_id, 'all')
                 return json_string
             else:
                 try:
@@ -116,14 +124,13 @@ def api():
                 message_in_cache = cache.memcache.get(hsh)
 
                 if message_in_cache:
-                    print "Message found in cache"
-                    return json.dumps(message_in_cache)
+                    print "Message found for request (%s,%s) in cache " % (user_id, message_id)
+                    return message_in_cache
                 else:
                     for user_row in db(db.auth_user.id == user_id).select():
                         for message_row in user_row.messages.select():
                             if message_row.id == message_id:
                                 message = message_row.email_text
-                    
                     #If the message was found, convert it to a JSON string and return the JSON string
                     if message == '':
                         return 'FAIL! Message id not found.'
@@ -131,14 +138,14 @@ def api():
                         messages = []
                         messages.append(message)
                         json_string = json.dumps(messages)
+                        cache.memcache.set(hsh, json_string)
+                        print "Message found for request (%s,%s) in cache " % (user_id, message_id)
                         return json_string
-                    
         elif table == 'contacts':
             #Build an array of Contacts
             contacts = []
             for row in db().select(db.auth_user.email):
                 contacts.append(row.email)
-            
             #Convert the array to a JSON string and return the JSON string
             json_string = json.dumps(contacts)
             return json_string
@@ -166,8 +173,8 @@ def api():
                 target_id = row[0].id
                 user_id = auth.user.id
                 msgid = db.messages.insert(to_user=target_id, from_user=user_id, email_text=message)
-                hsh = _hash(msgid, user_id)
-                cache.memcache.add(hsh, message)
+                hsh = _hash('all', user_id)
+                cache.memcache.delete(hsh)
             return 'You have posted to "%s" a message that says: "%s"' % (target, message)
     def PUT(*args,**vars):
         return ''
@@ -196,4 +203,3 @@ def generate_ssl_key():
     import os
     cert_dir, CERT_FILE, KEY_FILE = (os.path.join(request.folder, "private"), 'mysite.crt', 'mysite.key')
     return(dict(cert_dir=cert_dir, CERT_FILE=CERT_FILE, KEY_FILE=KEY_FILE))
-
