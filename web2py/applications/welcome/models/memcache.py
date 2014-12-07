@@ -10,7 +10,7 @@ import re
 
 ##This code will detect what host and port web2py is running on
 ##And will map to a memcache server port based on memcache_config.txt file
-
+"""
 url = URL(r=request, host=True)
 match = re.match(r'http:\/\/(.+):(\d+)\/.+', url)
 distributedServerList = list()
@@ -48,3 +48,8 @@ if match:
 
 else:
 	print "Memcache not setup: No port found in %s" % url
+"""
+
+memcache_servers = ['127.0.0.1:11211']
+cache.memcache = MemcacheClient(request, memcache_servers)
+cache.ram = cache.disk = cache.memcache

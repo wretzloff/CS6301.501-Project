@@ -1,8 +1,108 @@
 <style>
-	td {
-		border: 1px solid black;
-	}			
+	body { font-family:sans-serif; }
+
+.grouped ul{
+	list-style: none;
+}
+
+.grouped li{
+	display: inline;
+}
+
+table, caption, tbody, tfoot, thead, tr, th, td {
+	background: transparent;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	vertical-align: baseline;
+}
+
+.mailinbox tbody tr td { background: #fafafa; }
+.mailinbox tbody tr.unread td { background: #fff; font-weight: bold; }
+.mailinbox tbody tr.selected td { background:#FFFFD2; }
+.mailinbox thead th, .mailinbox tfoot th { border: 1px solid #ccc; border-right: 0; }
+.mailinbox tfoot th { border-bottom: 1px solid #ccc !important; }
+.mailinbox a.title { font-weight: normal; text-decoration:none; }
+.mailinbox tbody tr.unread a.title { font-weight: bold; }
+.mailinbox td.star, .mailinbox td.attachment { text-align: center; }
+.msgstar { 
+	display: inline-block; width: 16px; height: 16px; background: url(images/unstar.png) no-repeat 0 0; 
+	cursor: pointer; opacity: 0.5; 
+}
+.msgstar:hover { opacity: 1; }
+.starred { background-image: url(images/star.png); opacity: 1; }
+
+
+
+.table-bordered caption + thead tr:first-child th:first-child, .table-bordered caption + tbody tr:first-child td:first-child, .table-bordered colgroup + thead tr:first-child th:first-child, .table-bordered colgroup + tbody tr:first-child td:first-child { border-top-left-radius: 0; }
+
+.table-bordered caption + thead tr:first-child th:last-child, .table-bordered caption + tbody tr:first-child td:last-child, .table-bordered colgroup + thead tr:first-child th:last-child, .table-bordered colgroup + tbody tr:first-child td:last-child { border-top-right-radius: 0; }
+
+.table-bordered thead:first-child tr:first-child th:first-child, 
+.table-bordered tbody:first-child tr:first-child td:first-child,
+.table-bordered thead:first-child tr:first-child th:last-child, 
+.table-bordered tbody:first-child tr:first-child td:last-child,
+.table-bordered thead:last-child tr:last-child th:first-child, 
+.table-bordered tbody:last-child tr:last-child td:first-child, 
+.table-bordered tfoot:last-child tr:last-child td:first-child { -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0; }
+
+
+.table { margin-bottom: 0; width:100%; font-size:14px }
+.table th { background: #fcfcfc; }
+.table tfoot th { border-bottom: 1px solid #ddd; }
+.table th.aligncenter, .table td.aligncenter { text-align: center; }
+.table tr { padding:5px; height:28px}
+table td.center, table th.center { text-align: center; }
+
+.clearall { clear: both; }
+
+.mailinbox thead th, .mailinbox tfoot th {
+	background: rgb(237,237,237);
+	background: -moz-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(222,222,222,1) 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(237,237,237,1)), color-stop(100%,rgba(222,222,222,1)));
+	background: -webkit-linear-gradient(top, rgba(237,237,237,1) 0%,rgba(222,222,222,1) 100%);
+	background: -o-linear-gradient(top, rgba(237,237,237,1) 0%,rgba(222,222,222,1) 100%);
+	background: -ms-linear-gradient(top, rgba(237,237,237,1) 0%,rgba(222,222,222,1) 100%);
+	background: linear-gradient(to bottom, rgba(237,237,237,1) 0%,rgba(222,222,222,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#dedede',GradientType=0 );
+}
+		
 </style>
+
+{{extend 'layout.html'}}
+
+<div id="mail">
+
+        <ul class="grouped">
+            <li><a href="#composeIframe" role="button" class="btn" data-toggle="modal">Compose</a></li>
+            <li><a href="#" class="btn icon refresh" onclick="location.reload();">Refresh</a></li>
+        </ul>
+    
+    <table class="table table-bordered mailinbox" style="border-collapse:collapse; margin-top:10px;" border="0" cellpadding="5" cellspacing="3">
+
+        <thead>
+        <tr>
+            <th class="head1">Sender</th>
+            <th class="head0">Message</th>
+        </tr>
+        </thead>
+        <tbody id='messageTable0'>
+        </tbody>
+    </table>             
+ </div>
+
+<div id="composeIframe" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="myModalLabel">Compose</h3>
+	</div>
+	<iframe id='iframeElement' src="{{=URL('compose')}}" allowtransparency=true frameborder=0 id=rf sandbox="allow-same-origin allow-forms allow-scripts" scrolling=auto style="width:500px;height:300px"></iframe>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		<button class="btn btn-primary" onclick="iframeSendMessage();">Send</button>
+	</div>
+</div>
+
 <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script type="text/javascript">
 function getAllMessages(callbackFunctionOnSuccess){
@@ -19,21 +119,20 @@ function getAllMessages(callbackFunctionOnSuccess){
             alert('Error');
         }
     });
-	
-	return returnData;
 }
 
-function sendDelete(){
+function sendDelete(message_id){
     $.ajax({
         url: "http://127.0.0.1:8000/welcome/default/api",
         type: "DELETE",
-        data: {	table: 'messages', message_id: 3},
+        data: {	table: 'messages', message_id: message_id},
         dataType: 'text',
         beforeSend: function (xhr){
 			//xhr.setRequestHeader('Authorization', make_base_auth('wretzloff@teamA.com','abcd1234'));
         },
         success: function(data) {
-            alert(data);
+            //alert(data);
+            location.reload();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert('Error');
@@ -68,22 +167,19 @@ function addRow(cell1Text, cell2Text)
 	cell1.innerHTML = cell1Text;
 	cell2.innerHTML = cell2Text;
 	//Insert the row into the table
-	$('#messageTable').append(row);			
+	$('#messageTable0').prepend(row);			
 }	
+
+window.closeModal = function(){
+    $('#composeIframe').modal('hide');
+};
+
+function iframeSendMessage(){
+	document.getElementById('iframeElement').contentWindow.sendButton();
+}
 
 $(document).ready(function(){
 	//Call the Get Messages service to retrieve all messages for this user and use the results to update the page.
 	getAllMessages(getSuccessfulCallbackFunction);
 });
 </script>
-
-{{extend 'layout.html'}}
-<a href="{{=URL('compose')}}">Compose</a><br/>
-<a href="{{=URL('memcached')}}">Memcache</a>
-<table id='messageTable' style="width:95%">
-	<tr>
-		<td style="text-align:center;font-size: 32px;">Sender</td>
-		<td style="text-align:center;font-size: 32px;">Message</td>
-	</tr>
-</table>
-
